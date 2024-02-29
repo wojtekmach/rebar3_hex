@@ -604,7 +604,15 @@ create_package_tarball(Metadata, Files) ->
 
 -dialyzer({nowarn_function, create_docs_tarball/1}).
 create_docs_tarball(Files) ->
-    case hex_tarball:create_docs(Files) of
+    Config =
+        maps:merge(
+            hex_core:default_config(),
+            #{
+                tarball_max_size => 16 * 1024 * 1024,
+                tarball_max_uncompressed_size => 128 * 1024 * 1024
+            }
+        ),
+    case hex_tarball:create_docs(Files, Config) of
         {ok, Tarball} ->
             {ok, Tarball};
         Error ->
